@@ -1,5 +1,11 @@
 exports.up = function(knex) {
   return knex.schema
+    .createTable("quotes", quotes => {
+      quotes.uuid("id").primary();
+      quotes.string("quote", 500);
+      quotes.string("character", 255);
+      quotes.string("episode", 255);
+    })
     .createTable("users", users => {
       users.uuid("id").primary();
 
@@ -9,20 +15,14 @@ exports.up = function(knex) {
         .unique();
       users.string("password", 255).notNullable();
       users
-        .integer("quotes_id")
+        .integer("favorites")
         .references("id")
         .inTable("quotes")
-        .notNullable()
-        .onDelete("cascade");
-    })
-    .createTable("quotes", quote => {
-      quotes.uuid("id").primary();
-      quotes.string("quote", 500);
-      quotes.character("character", 255);
-      quotes.episode("episode", 255);
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
     });
 };
 
 exports.down = function(knex, Promise) {
-  return knex.schema.dropTableIfExists("users");
+  return knex.schema.dropTableIfExists("users").dropTableIfExists("quotes");
 };

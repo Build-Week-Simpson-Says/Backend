@@ -2,12 +2,14 @@ const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { authenticate, jwtKey } = require('../auth/authenticate');
-const Users = require('../data/user-model')
+const Users = require('../data/user-model');
+const Quotes = require('../data/quotes-model');
 
 module.exports = server => {
   server.post('/api/register', register);
   server.post('/api/login', login);
-  server.get('/api/jokes', authenticate, getJokes);
+  // server.post('/api/user/quotes', authenticate, favoriteQuote)
+  server.get('/api/quotes', authenticate, getQuotes);
 };
 
 function register(req, res) {
@@ -54,17 +56,6 @@ function generateToken(user) {
   return jwt.sign(payload, jwtKey, option);
 }
 
-function getJokes(req, res) {
-  const requestOptions = {
-    headers: { accept: 'application/json' },
-  };
-
-  axios
-    .get('https://icanhazdadjoke.com/search', requestOptions)
-    .then(response => {
-      res.status(200).json(response.data.results);
-    })
-    .catch(err => {
-      res.status(500).json({ message: 'Error Fetching Quotes', error: err });
-    });
+function getQuotes(req, res) {
+ Quotes.find()
 }
