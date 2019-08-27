@@ -4,7 +4,8 @@ module.exports = {
   add,
   find,
   findBy,
-  findById
+  findById,
+  addFavorite
 };
 
 async function add(user) {
@@ -24,4 +25,10 @@ function findById(id) {
   return db('users')
     .where({ id })
     .first();
+}
+
+function addFavorite (newFavorite) {
+  return db('users')
+      .insert(newFavorite)
+      .into('favorites');
 }

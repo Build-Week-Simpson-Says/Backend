@@ -8,7 +8,7 @@ const Quotes = require("../data/quotes-model");
 module.exports = server => {
   server.post("/api/register", register);
   server.post("/api/login", login);
-  // server.post('/api/user/quotes', authenticate, favoriteQuote)
+  // server.post("/api/user/quotes", authenticate, addFavorite);
   server.get("/api/quotes", authenticate, getQuotes);
 };
 
@@ -21,12 +21,10 @@ function register(req, res) {
       res.status(201).json(saved);
     })
     .catch(error => {
-      res
-        .status(500)
-        .json({
-          message: `Check register function routes.js`,
-          error: `${error}`
-        });
+      res.status(500).json({
+        message: `Check register function routes.js`,
+        error: `${error}`
+      });
     });
 }
 
@@ -48,12 +46,10 @@ function login(req, res) {
       }
     })
     .catch(error => {
-      res
-        .status(500)
-        .json({
-          message: "Server error, check login function on routes.js",
-          error: `${error}`
-        });
+      res.status(500).json({
+        message: "Server error, check login function on routes.js",
+        error: `${error}`
+      });
     });
 }
 function generateToken(user) {
@@ -73,4 +69,17 @@ function getQuotes(req, res) {
       res.json({ quotes, decodedToken: req.decodedToken });
     })
     .catch(error => res.send(error));
+}
+
+function addFavorite(req, res) {
+  // let { id }
+  Users.addFavorite(req.body);
+  console
+    .log(req)
+    .then(newQuote => {
+      res.json({ newQuote, decodedToken: req.decodedToken });
+    })
+    .catch(err => {
+      res.send(err);
+    });
 }

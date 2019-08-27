@@ -1,16 +1,16 @@
 const db = require("./dbConfig");
 
 module.exports = {
-  add,
+  // addQuote,
   find,
   findBy
 };
 
-function add (newFavorite) {
-    return db('users')
-        .insert(newFavorite)
-        .into('favorite');
-}
+// function addQuote (newFavorite) {
+//     return db('users')
+//         .insert(newFavorite)
+//         .into('favorites');
+// }
 
 function findBy(search) {
   return db("quotes").where(search);
