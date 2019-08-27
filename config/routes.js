@@ -1,15 +1,15 @@
-const axios = require('axios');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { authenticate, jwtKey } = require('../auth/authenticate');
-const Users = require('../data/user-model');
-const Quotes = require('../data/quotes-model');
+const axios = require("axios");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { authenticate, jwtKey } = require("../auth/authenticate");
+const Users = require("../data/user-model");
+const Quotes = require("../data/quotes-model");
 
 module.exports = server => {
-  server.post('/api/register', register);
-  server.post('/api/login', login);
+  server.post("/api/register", register);
+  server.post("/api/login", login);
   // server.post('/api/user/quotes', authenticate, favoriteQuote)
-  server.get('/api/quotes', authenticate, getQuotes);
+  server.get("/api/quotes", authenticate, getQuotes);
 };
 
 function register(req, res) {
@@ -21,9 +21,13 @@ function register(req, res) {
       res.status(201).json(saved);
     })
     .catch(error => {
-    res.status(500).json({ message: `Check register function routes.js`, error:`${error}`})
-  })
-
+      res
+        .status(500)
+        .json({
+          message: `Check register function routes.js`,
+          error: `${error}`
+        });
+    });
 }
 
 function login(req, res) {
@@ -38,12 +42,19 @@ function login(req, res) {
           token
         });
       } else {
-        res.status(401).json({ message: 'Check username and password and try again'})
+        res
+          .status(401)
+          .json({ message: "Check username and password and try again" });
       }
     })
     .catch(error => {
-    res.status(500).json({ message: 'Server error, check login function on routes.js', error: `${error}`})
-  })
+      res
+        .status(500)
+        .json({
+          message: "Server error, check login function on routes.js",
+          error: `${error}`
+        });
+    });
 }
 function generateToken(user) {
   const payload = {
@@ -51,11 +62,15 @@ function generateToken(user) {
     username: user.username
   };
   const option = {
-    expiresIn: '1d'
+    expiresIn: "1d"
   };
   return jwt.sign(payload, jwtKey, option);
 }
 
 function getQuotes(req, res) {
- Quotes.find()
+  Quotes.find()
+    .then(quotes => {
+      res.json({ quotes, decodedToken: req.decodedToken });
+    })
+    .catch(error => res.send(error));
 }
