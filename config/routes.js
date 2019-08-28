@@ -8,9 +8,24 @@ const Quotes = require("../data/quotes-model");
 module.exports = server => {
   server.post("/api/register", register);
   server.post("/api/login", login);
-  // server.post("/api/user/quotes", authenticate, addFavorite);
+  server.post("/api/user/quotes", authenticate, addFavorite);
+  server.get("/api/quotes/:userId", getQuotesByUser)
   server.get("/api/quotes", authenticate, getQuotes);
+  server.get("/api/users", getUsers);
+  server.get("/api/users/:id", getUserById);
+  server.get("/api/favorites", getFavorites);
 };
+
+function getUserById(req, res) {
+  let id = req.params.id
+  Users.findById(id)
+    .then(user => {
+      res.status(200).json({ user });
+    })
+    .catch(err => {
+      res.send(err);
+    });
+}
 
 function register(req, res) {
   let user = req.body;
@@ -63,6 +78,26 @@ function generateToken(user) {
   return jwt.sign(payload, jwtKey, option);
 }
 
+function getFavorites(req, res) {
+  Users.findFavorites()
+    .then(favorites => {
+      res.status(200).json({ favorites });
+    })
+    .catch(err => {
+      res.send(err);
+    });
+}
+
+function getUsers(req, res) {
+  Users.find()
+    .then(users => {
+      res.status(200).json({ users });
+    })
+    .catch(err => {
+      res.send(err);
+    });
+}
+
 function getQuotes(req, res) {
   Quotes.find()
     .then(quotes => {
@@ -71,15 +106,26 @@ function getQuotes(req, res) {
     .catch(error => res.send(error));
 }
 
-function addFavorite(req, res) {
-  // let { id }
-  Users.addFavorite(req.body);
-  console
-    .log(req)
-    .then(newQuote => {
-      res.json({ newQuote, decodedToken: req.decodedToken });
+function getQuotesByUser(req, res) {
+  const { userId } = req.params;
+  Users.findByUser(userId)
+    .then(item => {
+      res.status(200).json(item);
     })
     .catch(err => {
+      console.log(err);
+      res.status(500).json(err);
+    });
+}
+
+function addFavorite(req, res) {
+  // let { id }
+  Users.addFavorite(req.body)
+    .then(newQuote => {
+      res.json({ newQuote });
+    })
+    .catch(err => {
+      console.log(err);
       res.send(err);
     });
 }

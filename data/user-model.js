@@ -1,34 +1,69 @@
-const db = require('./dbConfig');
+const db = require("./dbConfig");
 
 module.exports = {
   add,
   find,
   findBy,
   findById,
-  addFavorite
+  addFavorite,
+  findByUser,
+  findFavorites
 };
 
 async function add(user) {
-  const [id] = await db('users').insert(user);
+  const [id] = await db("users").insert(user);
   return findById(id);
 }
 
-function find() {
-  return db('users').select('id', 'username', 'password');
+async function find() {
+  const users = await db("users");
+  
+  const withQuotes = users.map(async user => {
+    user.favorites = await db("favorites")
+      .where('user_favorites', user.id)
+      .join('quotes', 'quotes.id', 'favorites.quote_id')
+      .select('quotes.*')
+    return user
+  })
+
+  const results = await Promise.all(withQuotes)
+
+  return results
+}
+
+function findFavorites() {
+  return db("favorites");
 }
 
 function findBy(filter) {
-  return db('users').where(filter);
+  return db("users").where(filter);
 }
 
-function findById(id) {
-  return db('users')
+async function findById(id) {
+  let user = await db("users")
     .where({ id })
     .first();
+  user.favorites = await db("favorites")
+    .where('user_favorites', id)
+    .join('quotes', 'quotes.id', 'favorites.quote_id')
+    .select('quotes.*')
+  return user
 }
 
-function addFavorite (newFavorite) {
-  return db('users')
-      .insert(newFavorite)
-      .into('favorites');
+function findByUser (userId) {
+  return db("favorites")
+  .join("users", "users.id", "favorites.user_favorites")
+  .where("favorites.user_favorites", userId)
+}
+
+function addFavorite(newFavorite) {
+  return db("favorites")
+    .insert(newFavorite)
+    .then(() => {
+      console.table("favorites")
+      return db("users")
+        .join("favorites", "favorites.user_favorites", "users.id")
+        .select("favorites.*")
+        .first();
+    });
 }
