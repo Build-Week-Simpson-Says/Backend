@@ -9,15 +9,16 @@ module.exports = server => {
   server.post("/api/register", register);
   server.post("/api/login", login);
   server.post("/api/user/quotes", authenticate, addFavorite);
-  server.get("/api/quotes/:userId", getQuotesByUser)
+  server.get("/api/quotes/:userId", getQuotesByUser);
   server.get("/api/quotes", authenticate, getQuotes);
   server.get("/api/users", getUsers);
   server.get("/api/users/:id", getUserById);
   server.get("/api/favorites", getFavorites);
+  server.delete("/api/quotes/:userId/:id", getQuotesByUser,deleteFavorite);
 };
 
 function getUserById(req, res) {
-  let id = req.params.id
+  let id = req.params.id;
   Users.findById(id)
     .then(user => {
       res.status(200).json({ user });
@@ -114,6 +115,16 @@ function getQuotesByUser(req, res) {
     })
     .catch(err => {
       console.log(err);
+      res.status(500).json(err);
+    });
+}
+function deleteFavorite(req, res) {
+  const { userId, id } = req.params;
+  Users.deleteFavorite(id)
+    .then(() => {
+      res.json({ message: "succeeded" });
+    })
+    .catch(err => {
       res.status(500).json(err);
     });
 }

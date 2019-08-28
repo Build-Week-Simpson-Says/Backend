@@ -41,7 +41,7 @@ exports.up = function(knex) {
         .inTable("favorites")
         .onDelete("CASCADE")
         .onUpdate("CASCADE");
-      users.string("favoriteChar", 255);
+      users.string("favChar", 255);
     });
 };
 

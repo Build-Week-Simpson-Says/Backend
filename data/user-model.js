@@ -7,7 +7,8 @@ module.exports = {
   findById,
   addFavorite,
   findByUser,
-  findFavorites
+  findFavorites,
+  deleteFavorite
 };
 
 async function add(user) {
@@ -17,18 +18,18 @@ async function add(user) {
 
 async function find() {
   const users = await db("users");
-  
+
   const withQuotes = users.map(async user => {
     user.favorites = await db("favorites")
-      .where('user_favorites', user.id)
-      .join('quotes', 'quotes.id', 'favorites.quote_id')
-      .select('quotes.*')
-    return user
-  })
+      .where("user_favorites", user.id)
+      .join("quotes", "quotes.id", "favorites.quote_id")
+      .select("quotes.*");
+    return user;
+  });
 
-  const results = await Promise.all(withQuotes)
+  const results = await Promise.all(withQuotes);
 
-  return results
+  return results;
 }
 
 function findFavorites() {
@@ -44,23 +45,28 @@ async function findById(id) {
     .where({ id })
     .first();
   user.favorites = await db("favorites")
-    .where('user_favorites', id)
-    .join('quotes', 'quotes.id', 'favorites.quote_id')
-    .select('quotes.*')
-  return user
+    .where("user_favorites", id)
+    .join("quotes", "quotes.id", "favorites.quote_id")
+    .select("quotes.*");
+  return user;
 }
 
-function findByUser (userId) {
+function deleteFavorite(delFav) {
   return db("favorites")
-  .join("users", "users.id", "favorites.user_favorites")
-  .where("favorites.user_favorites", userId)
+    .where(delFav, "favorite.id")
+    .del();
+}
+
+function findByUser(userId) {
+  return db("favorites")
+    .join("users", "users.id", "favorites.user_favorites")
+    .where("favorites.user_favorites", userId);
 }
 
 function addFavorite(newFavorite) {
   return db("favorites")
     .insert(newFavorite)
     .then(() => {
-      console.table("favorites")
       return db("users")
         .join("favorites", "favorites.user_favorites", "users.id")
         .select("favorites.*")
