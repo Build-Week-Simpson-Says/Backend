@@ -15,6 +15,7 @@ module.exports = server => {
   server.get("/api/users/:id", getUserById);
   server.get("/api/favorites", getFavorites);
   server.delete("/api/user/quotes/:id", deleteFavorite);
+  server.put("/api/users/:id", updateUsers);
 };
 
 function getUserById(req, res) {
@@ -25,6 +26,23 @@ function getUserById(req, res) {
     })
     .catch(err => {
       res.send(err);
+    });
+}
+
+function updateUsers(req, res) {
+  let id = req.params.id;
+  let user = req.body;
+  const hash = bcrypt.hashSync(user.password, 12);
+  user.password = hash;
+  Users.updateById(id, user)
+    .then(updatedUser => {
+      res.status(201).json(updatedUser);
+    })
+    .catch(error => {
+      res.status(500).json({
+        message: `Check updateUsers function routes.js`,
+        error: `${error}`
+      });
     });
 }
 
@@ -53,7 +71,8 @@ function login(req, res) {
         const token = generateToken(user);
         res.status(200).json({
           message: `Welcome ${user.username}!`,
-          token, user
+          token,
+          user
         });
       } else {
         res

@@ -8,12 +8,19 @@ module.exports = {
   addFavorite,
   findByUser,
   findFavorites,
-  deleteFavorite
+  deleteFavorite,
+  updateById
 };
 
 async function add(user) {
   const [id] = await db("users").insert(user);
   return findById(id);
+}
+
+function updateById(id, user) {
+  return db("users")
+    .where({ id: id })
+    .update(user);
 }
 
 async function find() {
