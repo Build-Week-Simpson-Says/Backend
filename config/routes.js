@@ -14,7 +14,7 @@ module.exports = server => {
   server.get("/api/users", getUsers);
   server.get("/api/users/:id", getUserById);
   server.get("/api/favorites", getFavorites);
-  server.delete("/api/quotes/:userId/:id", getQuotesByUser,deleteFavorite);
+  server.delete("/api/user/quotes/:id", deleteFavorite);
 };
 
 function getUserById(req, res) {
@@ -53,7 +53,7 @@ function login(req, res) {
         const token = generateToken(user);
         res.status(200).json({
           message: `Welcome ${user.username}!`,
-          token
+          token, user
         });
       } else {
         res
@@ -119,12 +119,12 @@ function getQuotesByUser(req, res) {
     });
 }
 function deleteFavorite(req, res) {
-  const { userId, id } = req.params;
-  Users.deleteFavorite(id)
+  Users.deleteFavorite(req.params.id)
     .then(() => {
       res.json({ message: "succeeded" });
     })
     .catch(err => {
+      console.log(err);
       res.status(500).json(err);
     });
 }

@@ -53,7 +53,7 @@ async function findById(id) {
 
 function deleteFavorite(delFav) {
   return db("favorites")
-    .where(delFav, "favorite.id")
+    .where("favorites.id", delFav)
     .del();
 }
 
