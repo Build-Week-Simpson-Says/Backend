@@ -17,10 +17,11 @@ async function add(user) {
   return findById(id);
 }
 
-function updateById(id, user) {
-  return db("users")
+async function updateById(id, user) {
+   await db("users")
     .where({ id: id })
-    .update(user);
+    .update(user)
+  return findById(id)
 }
 
 async function find() {
@@ -70,13 +71,11 @@ function findByUser(userId) {
     .where("favorites.user_favorites", userId);
 }
 
-function addFavorite(newFavorite) {
-  return db("favorites")
+async function addFavorite(newFavorite) {
+  const [id] = await db("favorites")
     .insert(newFavorite)
-    .then(() => {
-      return db("users")
-        .join("favorites", "favorites.user_favorites", "users.id")
-        .select("favorites.*")
-        .first();
-    });
+    // .returning('id')
+  return db("favorites")
+    .where({ id })
+    .first();
 }

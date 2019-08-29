@@ -150,8 +150,10 @@ function deleteFavorite(req, res) {
 
 function addFavorite(req, res) {
   // let { id }
+  console.log(`RES`, req.body);
   Users.addFavorite(req.body)
     .then(newQuote => {
+      console.log(newQuote)
       res.json({ newQuote });
     })
     .catch(err => {
