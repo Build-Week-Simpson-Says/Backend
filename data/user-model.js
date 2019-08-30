@@ -18,10 +18,10 @@ async function add(user) {
 }
 
 async function updateById(id, user) {
-   await db("users")
+  await db("users")
     .where({ id: id })
-    .update(user)
-  return findById(id)
+    .update(user);
+  return findById(id);
 }
 
 async function find() {
@@ -74,8 +74,10 @@ function findByUser(userId) {
 async function addFavorite(newFavorite) {
   const [id] = await db("favorites")
     .insert(newFavorite)
-    // .returning('id')
   return db("favorites")
     .where({ id })
     .first();
 }
+// .join("favorites", "favorites.user_favorites", "users.id")
+// .select("favorites.*")
+// .first();

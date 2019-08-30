@@ -2,7 +2,7 @@ exports.up = function(knex) {
   return knex.schema
     .createTable("quotes", quotes => {
       quotes
-        .increments("id")
+        .integer("id")
         .primary()
         .notNullable();
       quotes.string("quote", 500);
