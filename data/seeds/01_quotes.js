@@ -4,37 +4,29 @@ const path = require('path');
 
 let results = [];
 
-const insertQuote = (knex, line) => {
-  return knex("quotes").select()
-  .where('id', line.id)
-  .then(function(rows) {
-    if (rows.length===0) {
-        // no matching records found
-        return knex('quotes').insert(line)
-    } else {
-        // return or throw - duplicate name found
-        // console.log('dupe')
-    }
-  })
-  .catch(function(ex) {
-    // you can find errors here.
-  })
+const insertQuote = (knex, batch) => {
+  return knex('quotes').insert(batch).catch(err => console.error(err));
 }
 
 exports.seed = async function (knex) {
   knex("quotes")
     .del()
-
   const lines = require('../clean_lines.json');
-  // console.log(lines[0])
-  quote_promises = []
+  quote_promises = [];
+  counter = 0;
+  batch = [];
   for (line in lines) {
-    quote_promises.push(insertQuote(knex,lines[line]));
-
-    
+    if (counter < 40) {
+      batch.push(lines[line]);
+      counter += 1;
+    } else {
+      batch.push(lines[line]);
+      quote_promises.push(insertQuote(knex,batch));
+      batch = [];
+      counter = 0;
+    }
   }
   return Promise.all(quote_promises);
-
 };
 
 // {
