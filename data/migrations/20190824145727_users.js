@@ -1,5 +1,15 @@
 exports.up = function(knex) {
   return knex.schema
+    
+    .createTable('quotes', quotes => {
+      // the import script is set up to continue after the largest id inserted
+      // so it is safe to make it auto-increment
+      quotes.increments();
+      // the are quotes longer than 500 they fail when importing into Postgres
+      quotes.string('quote', 4000);
+      quotes.string('character', 255); // this has null values for some records
+      quotes.integer('episode', 255); // this is always a number or null
+    })
     .createTable('users', users => {
       users.increments('id');
       users
@@ -10,19 +20,10 @@ exports.up = function(knex) {
       users.string('favChar', 255);
       users.string('favorites', 255);
     })
-    .createTable('quotes', quotes => {
-      // the import script is set up to continue after the largest id inserted
-      // so it is safe to make it auto-increment
-      quotes.increments();
-      // the are quotes longer than 500 they fail when importing into Postgres
-      quotes.string('quote', 4000);
-      quotes.string('character', 255); // this has null values for some records
-      quotes.integer('episode', 255); // this is always a number or null
-    })
     .createTable('favorites', favorites => {
       favorites.increments('id');
       favorites
-        .integer('user_id')
+        .integer('user_favorites')
         .unsigned()
         .references('id')
         .inTable('users')
