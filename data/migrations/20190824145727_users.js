@@ -1,47 +1,50 @@
 exports.up = function(knex) {
   return knex.schema
-    
-    .createTable('quotes', quotes => {
-      // the import script is set up to continue after the largest id inserted
-      // so it is safe to make it auto-increment
-      quotes.increments();
-      // the are quotes longer than 500 they fail when importing into Postgres
-      quotes.string('quote', 4000);
-      quotes.string('character', 255); // this has null values for some records
-      quotes.integer('episode', 255); // this is always a number or null
+    .createTable("quotes", quotes => {
+      quotes
+        .integer("id")
+        .primary()
+        .notNullable();
+      quotes.string("quote", 500);
+      quotes.string("character", 255);
+      quotes.string("episode", 255);
     })
-    .createTable('users', users => {
-      users.increments('id');
+    .createTable("favorites", favorite => {
+      favorite.increments("id").primary().notNullable();
+      favorite
+        .integer("quote_id")
+        .references("id")
+        .inTable("quotes")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
+      favorite
+        .integer("user_favorites")
+        .references("id")
+        .inTable("users")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
+    })
+    .createTable("users", users => {
       users
-        .string('username', 255)
+        .increments("id")
+        .primary()
+        .notNullable();
+
+      users
+        .string("username", 255)
         .notNullable()
         .unique();
-      users.string('password', 255).notNullable();
-      users.string('favChar', 255);
-      users.string('favorites', 255);
-    })
-    .createTable('favorites', favorites => {
-      favorites.increments('id');
-      favorites
-        .integer('user_favorites')
-        .unsigned()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE')
-        .onUpdate('CASCADE');
-      favorites
-        .integer('quote_id')
-        .unsigned()
-        .references('id')
-        .inTable('quotes')
-        .onDelete('CASCADE')
-        .onUpdate('CASCADE');
+      users.string("password", 255).notNullable();
+      users
+        .integer("favorites")
+        .references("id")
+        .inTable("favorites")
+        .onDelete("CASCADE")
+        .onUpdate("CASCADE");
+      users.string("favChar", 255);
     });
 };
-exports.down = function(knex) {
-  // reordered the tables to respect the Foreign Keys
-  return knex.schema
-    .dropTableIfExists('favorites')
-    .dropTableIfExists('users')
-    .dropTableIfExists('quotes');
+
+exports.down = function(knex, Promise) {
+  return knex.schema.dropTableIfExists("users").dropTableIfExists("middle").dropTableIfExists("quotes");
 };
