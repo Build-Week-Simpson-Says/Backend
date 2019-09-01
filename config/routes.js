@@ -22,6 +22,7 @@ function getUserById(req, res) {
   let id = req.params.id;
   Users.findById(id)
     .then(user => {
+      console.log(user)
       res.status(200).json({ user });
     })
     .catch(err => {
