@@ -61,7 +61,9 @@ async function findById(id) {
 
 function deleteFavorite(delFav) {
   return db("favorites")
-    .where("favorites.id", delFav)
+    .where({
+      quote_id: delFav.quote_id,
+      user_favorites: delFav.id})
     .del();
 }
 

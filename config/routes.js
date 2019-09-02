@@ -14,7 +14,7 @@ module.exports = server => {
   server.get("/api/users", getUsers);
   server.get("/api/users/:id", getUserById);
   server.get("/api/favorites", getFavorites);
-  server.delete("/api/user/quotes/:id", deleteFavorite);
+  server.delete("/api/user/quotes/:id/:quote_id", deleteFavorite);
   server.put("/api/users/:id", updateUsers);
 };
 
@@ -139,7 +139,7 @@ function getQuotesByUser(req, res) {
     });
 }
 function deleteFavorite(req, res) {
-  Users.deleteFavorite(req.params.id)
+  Users.deleteFavorite(req.params)
     .then(() => {
       res.json({ message: "succeeded" });
     })
